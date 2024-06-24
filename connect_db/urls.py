@@ -7,8 +7,8 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('postgre_db_connect.urls'), name='root'),
     path('admin/', admin.site.urls),
-    path('api/', include('postgre_db_connect.urls'), name='db_data_api')
-    
+    path('api/', include('postgre_db_connect.urls'), name='db_data_api'),
+    path('api/orm/', include('orm_test.urls'), name='orm_test'),
 ]
 
 if settings.DEBUG:

@@ -10,22 +10,25 @@ from .serializers import ConnectDBSerializers
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class Connect(APIView):
+class Connect(APIView):  
     # get all dataset or specific data by pk
     def get(self, request, pk=None):
         try:
             if pk:
-                complex_data = ConnectDB.objects.get(user_id=pk)
-                serializers = ConnectDBSerializers(complex_data)
-                
-                return Response(serializers.data, status=status.HTTP_200_OK)
+                try:
+                    complex_data = ConnectDB.objects.get(user_id=pk)
+                    serializer = ConnectDBSerializers(complex_data)
+                    
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                except ConnectDB.DoesNotExist:
+                    return Response({'error': 'ConnectDB instance not found.'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 complex_data = ConnectDB.objects.all()
-                serializers = ConnectDBSerializers(complex_data, many=True)
+                serializer = ConnectDBSerializers(complex_data, many=True)
                 
-                return Response(serializers.data, status=status.HTTP_200_OK)
-        except ConnectDB.DoesNotExist:
-            return Response({ 'error': 'ConnectDB instance not found.!'}, content_type='application/json', status=status.HTTP_404_NOT_FOUND)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValueError:
+            return Response({'error': 'Invalid user ID.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RootPage(View):
